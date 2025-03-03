@@ -17,7 +17,7 @@ def proxy_type(type):
         res = request.get(url=url, impersonate='chrome110')
         return res.text
 
-    elif type='json':
+    elif type == 'json':
         res = request.get(url=url, impersonate='chrome110')
         return res.json()
 
