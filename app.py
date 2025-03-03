@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from curl_cffi import requests
 
@@ -19,11 +19,18 @@ def proxy_type(type):
     try:
         res = requests.get(url, impersonate='chrome110')
 
+        if res.status_code != 200:
+            return jsonify({'error': 'Failed to fetch data'}), res.status_code
+
         if type == 'text':
             return res.text
 
         elif type == 'json':
             return jsonify(res.json())  # Ensure valid JSON response
+
+        elif type == 'image':
+            content_type = res.headers.get('Content-Type', 'image/jpeg')  # Default to JPEG
+            return Response(res.content, content_type=content_type)
 
         else:
             return jsonify({'error': 'Invalid type parameter'}), 400
