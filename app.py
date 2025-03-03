@@ -13,13 +13,20 @@ def hello_world():
 def proxy_type(type):
     url = request.args.get('url')
 
-    if type == 'text':
-        res = request.get(url=url, impersonate='chrome110')
-        return res.text
+    if not url:
+        return jsonify({'error': 'Missing URL parameter'}), 400
 
-    elif type == 'json':
-        res = request.get(url=url, impersonate='chrome110')
-        return res.json()
+    try:
+        res = requests.get(url, impersonate='chrome110')
 
-    else:
-        return jsonify({'message': 'Hello, Soemthing went wrong'})
+        if type == 'text':
+            return res.text
+
+        elif type == 'json':
+            return jsonify(res.json())  # Ensure valid JSON response
+
+        else:
+            return jsonify({'error': 'Invalid type parameter'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
